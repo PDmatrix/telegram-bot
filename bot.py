@@ -18,12 +18,16 @@ def help(bot, update):
     update.message.reply_text('Help!')
 
 def sch(bot, update, args):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
     day = "завтра"
     if len(args) == 1:
         day = args[0].lower()
     update.message.reply_text(schedule.getSchedule(day))
 
 def rep(bot, update, args):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
     gr = "пр1-15"
     time = "tomorrow"
     if len(args) == 2:
