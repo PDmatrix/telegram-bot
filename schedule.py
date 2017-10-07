@@ -3,25 +3,38 @@ import codecs
 
 def getNum(day):
     day = day.lower()
-    if day == "\ufeffпонедельник\r\n":
+##    if day == "\ufeffпонедельник\r\n":
+##        return 0
+##    elif day == "вторник\r\n":
+##        return 1
+##    elif day == "среда\r\n":
+##        return 2
+##    elif day == "четверг\r\n":
+##        return 3
+##    elif day == "пятница\r\n":
+##        return 4
+##    elif day == "суббота\r\n":
+##        return 5
+##    else:
+##        return "Неправильно введён день"
+    if day == "понедельник":
         return 0
-    elif day == "вторник\r\n":
+    elif day == "вторник":
         return 1
-    elif day == "среда\r\n":
+    elif day == "среда":
         return 2
-    elif day == "четверг\r\n":
+    elif day == "четверг":
         return 3
-    elif day == "пятница\r\n":
+    elif day == "пятница":
         return 4
-    elif day == "суббота\r\n":
+    elif day == "суббота":
         return 5
     else:
         return "Неправильно введён день"
-    
+
 def getSchedule(day):
     date = datetime.today()
     week = date.weekday()
-    return week
     day = day.lower()
     if day == "пн":
         week = 0
