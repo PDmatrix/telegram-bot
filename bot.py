@@ -1,4 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
 import logging, answers, replacements, schedule, os
 
 # Enable logging
