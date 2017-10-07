@@ -50,7 +50,7 @@ def error(bot, update, error):
 def main():
     # Create the EventHandler and pass it your bot's token.
     TOKEN = "462202131:AAETYcmO8qi2m1SaQzs-zzqC_ycRHOqXG14"
-    PORT = int(os.environ.get('PORT', '5000'))
+    #PORT = int(os.environ.get('PORT', '5000'))
     updater = Updater(TOKEN)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -69,10 +69,12 @@ def main():
 
     # Start the Bot
 
-    #updater.start_polling()
-    updater.start_webhook(listen="0.0.0.0", port = PORT, url_path = TOKEN)
-    APPNAME = "telegrambotchemk"
-    updater.bot.set_webhook("https://{}.herokuapp.com/".format(APPNAME) + TOKEN)
+    updater.start_polling()
+    #WEBHOOK HEROKU
+    #updater.start_webhook(listen="0.0.0.0", port = PORT, url_path = TOKEN)
+    #APPNAME = "telegrambotchemk"
+    #updater.bot.set_webhook("https://{}.herokuapp.com/".format(APPNAME) + TOKEN)
+
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
