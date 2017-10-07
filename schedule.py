@@ -63,7 +63,7 @@ def getSchedule(day):
     for i in range(0,len(questions)):
         if getNum(questions[i]) == week:
             for j in range(i, len(questions)):
-                print(len(questions[i]))
+                print(len(questions[j]))
                 if len(questions[j]) == 2:
                     break
                 answer += questions[j]
