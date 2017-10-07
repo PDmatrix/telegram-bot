@@ -7,7 +7,7 @@ def findChange(group, day):
     soup = BeautifulSoup(cont, 'html.parser')
     lines = soup.find_all("tr")
     if len(lines) == 0:
-        return "Расписание не готово"
+        return "Расписание не готово."
     for i in range(5,len(lines) - 1):
         strs = lines[i].find_all("p")
         ans = ""
@@ -27,5 +27,5 @@ def findChange(group, day):
                 ans += "\n"
             return ans
     if ans == "":
-        return "Замены не найдены"
+        return "Нет замен."
 

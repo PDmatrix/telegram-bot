@@ -16,7 +16,7 @@ def getNum(day):
     elif day.find("суббота") != -1:
         return 5
     else:
-        return "Неправильно введён день"
+        return "Неправильно введён день."
 
 def getSchedule(day):
     date = datetime.today()
@@ -41,16 +41,16 @@ def getSchedule(day):
         if week == 6:
             week = 0
     else:
-        return "Введен неправильный день. Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра"
+        return "Введен неправильный день. Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра."
     
-    f = codecs.open("rs.txt", "r", "utf-8")
+    f = codecs.open("files\\rs.txt", "r", "utf-8")
     questions = f.readlines()
     answer = ""
     for i in range(0,len(questions)):
         if getNum(questions[i]) == week:
             for j in range(i, len(questions)):
                 #print(len(questions[j]))
-                if len(questions[j]) == 1:
+                if len(questions[j]) == 1 or len(questions[j]) == 2:
                     break
                 answer += questions[j]
             f.close()
