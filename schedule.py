@@ -17,17 +17,17 @@ def getNum(day):
 ##        return 5
 ##    else:
 ##        return "Неправильно введён день"
-    if day == "понедельник":
+    if day.find("понедельник") != -1:
         return 0
-    elif day == "вторник":
+    elif day.find("вторник") != -1:
         return 1
-    elif day == "среда":
+    elif day.find("среда") != -1:
         return 2
-    elif day == "четверг":
+    elif day.find("четверг") != -1:
         return 3
-    elif day == "пятница":
+    elif day.find("пятница") != -1:
         return 4
-    elif day == "суббота":
+    elif day.find("суббота") != -1:
         return 5
     else:
         return "Неправильно введён день"
@@ -61,7 +61,7 @@ def getSchedule(day):
     questions = f.readlines()
     answer = ""
     for i in range(0,len(questions)):
-        print(questions[i])
+        #print(getNum(questions[i]))
         if getNum(questions[i]) == week:
             for j in range(i, len(questions)):
                 if questions[j] == '\r\n':
