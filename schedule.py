@@ -21,6 +21,7 @@ def getNum(day):
 def getSchedule(day):
     date = datetime.today()
     week = date.weekday()
+    return week
     day = day.lower()
     if day == "пн":
         week = 0
@@ -42,7 +43,7 @@ def getSchedule(day):
             week = 0
     else:
         return "Введен неправильный день. Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра"
-
+    
     f = codecs.open("rs.txt", "r", "utf-8")
     questions = f.readlines()
     answer = ""
