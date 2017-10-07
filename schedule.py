@@ -60,8 +60,13 @@ def getSchedule(day):
     f = codecs.open("rs.txt", "r", "utf-8")
     questions = f.readlines()
     answer = ""
+<<<<<<< HEAD
     for i in range(0,len(questions)):
         #print(getNum(questions[i]))
+=======
+    for i in range(0,len(questions) - 1):
+        print(questions[i])
+>>>>>>> 2e5e6e4854dbb997bd2ebded12698237ffdf48f4
         if getNum(questions[i]) == week:
             for j in range(i, len(questions)):
                 if questions[j] == '\r\n':
