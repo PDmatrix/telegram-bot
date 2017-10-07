@@ -61,7 +61,7 @@ def getSchedule(day):
     questions = f.readlines()
     answer = ""
     for i in range(0,len(questions) - 1):
-        print(getNum(questions[i]))
+        print(questions[i])
         if getNum(questions[i]) == week:
             for j in range(i, len(questions)):
                 if questions[j] == '\r\n':
