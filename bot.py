@@ -1,5 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import logging, fileBotModule, replacements, schedule
+import logging, answers, replacements, schedule
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -42,7 +42,7 @@ def rep(bot, update, args):
     
 def echo(bot, update):
     #update.message.reply_text(update.message.text)
-    update.message.reply_text(fileBotModule.getAnswer(update.message.text))
+    update.message.reply_text(answers.getAnswer(update.message.text))
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))

@@ -3,20 +3,6 @@ import codecs
 
 def getNum(day):
     day = day.lower()
-##    if day == "\ufeffпонедельник\r\n":
-##        return 0
-##    elif day == "вторник\r\n":
-##        return 1
-##    elif day == "среда\r\n":
-##        return 2
-##    elif day == "четверг\r\n":
-##        return 3
-##    elif day == "пятница\r\n":
-##        return 4
-##    elif day == "суббота\r\n":
-##        return 5
-##    else:
-##        return "Неправильно введён день"
     if day.find("понедельник") != -1:
         return 0
     elif day.find("вторник") != -1:
@@ -63,7 +49,7 @@ def getSchedule(day):
     for i in range(0,len(questions)):
         if getNum(questions[i]) == week:
             for j in range(i, len(questions)):
-                print(len(questions[j]))
+                #print(len(questions[j]))
                 if len(questions[j]) == 1:
                     break
                 answer += questions[j]
