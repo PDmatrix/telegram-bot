@@ -1,18 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-#dy = "today"
-#result = requests.get("http://wwwold.chemk.org/student/raspisanie/4korp/{}.htm".format(dyc = result.content
-##soup = BeautifulSoup(c,'html.parser')
-##samp = soup.find_all("tr")
-##print(soup.table.contents[11].contents[5].p.text)
-##for i in range(5,len(samp) - 1):
-##    ps = samp[i].find_all("p")
-##    ans = ""
-##    for j in range(1,len(ps)):
-##        ans += ps[j].text + " "
-##    #print(ans)
-##ps = samp[45].find_all("p")
-#print(ps[0].text)
+
 def findChange(group, day):
     site = requests.get("http://wwwold.chemk.org/student/raspisanie/4korp/{}.htm".format(day))
     cont = site.content
@@ -40,5 +28,4 @@ def findChange(group, day):
             return ans
     if ans == "":
         return "Замены не найдены"
-        
-print(findChange("со1-16","tomorrow"))
+

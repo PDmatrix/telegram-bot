@@ -1,5 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import logging, fileBotModule, soup
+import logging, fileBotModule, replacements, schedule
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -17,6 +17,12 @@ def start(bot, update):
 def help(bot, update):
     update.message.reply_text('Help!')
 
+def sch(bot, update, args):
+    day = "завтра"
+    if len(args) == 1:
+        day = args[0].lower()
+    update.message.reply_text(schedule.getSchedule(day))
+
 def rep(bot, update, args):
     gr = "пр1-15"
     time = "tomorrow"
@@ -32,7 +38,7 @@ def rep(bot, update, args):
             time = args[0]
         else:
             gr = args[0]
-    update.message.reply_text(soup.findChange(gr,time))
+    update.message.reply_text(replacements.findChange(gr,time))
     
 def echo(bot, update):
     #update.message.reply_text(update.message.text)
@@ -52,6 +58,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("rep", rep, pass_args=True))
+    dp.add_handler(CommandHandler("sch", sch, pass_args=True))
     
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))

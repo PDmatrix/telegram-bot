@@ -1,5 +1,6 @@
+import codecs
 def getAnswer(question):
-    f = open("qu.txt", "r")
+    f = codecs.open("qu.txt", "r", "utf-8")
     answers = []
     questions = f.readlines()
     for i in range(0,len(questions) - 1,3):
