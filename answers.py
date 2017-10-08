@@ -3,7 +3,7 @@ def getAnswer(question):
     f = codecs.open("qu.txt", "r", "utf-8")
     answers = []
     questions = f.readlines()
-    for i in range(0,len(questions) - 1,3):
+    for i in range(0,len(questions),3):
         lowq = questions[i].lower()
         if lowq.find(question.lower()) != -1:
             answers.append(questions[i])

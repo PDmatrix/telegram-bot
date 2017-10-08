@@ -19,7 +19,7 @@ def getNum(day):
     else:
         return "Неправильно введён день."
 
-def getSchedule(day):
+def getSchedule(day = "завтра"):
     date = datetime.today()
     week = date.weekday()
     day = day.lower()
@@ -38,7 +38,7 @@ def getSchedule(day):
     elif day == "сегодня":
         week = date.weekday()
         if week == 6:
-            week = 0
+            week = 5
     elif day == "завтра":
         week += 1
         if week >= 6:

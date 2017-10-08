@@ -1,6 +1,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
-import logging, answers, replacements, schedule, os
+import logging, answers, replacements, schedule, os, hybrid
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -16,7 +16,24 @@ def start(bot, update):
 
 
 def help(bot, update):
-    update.message.reply_text('Help!')
+    update.message.reply_text(
+        'Бот, присылающий ответы по предмету ТБД. Также, он может прислать замены и расписание предметов ЧЭМК.\n'
+        'На данный момент доступны замены всех групп, но расписание только группы ПР1-15.\n'
+        'Для получения списка и описания комманд введите /command')
+
+def command(bot, update, args):
+    update.message.reply_text(
+        '/sch [день] - Расписание. По умолчанию возвращает расписание на завтра.\n'
+        'Принимает один необязательный аргумент.\n'
+        '[день] = \'пн\',\'вт\',\'ср\',\'чт\',\'пт\',\'сб\',\'завтра\',\'сегодня\'\n'
+        '\n/rep [день] [группа] - Замены. По умолчанию возвращает замены группы Пр1-15 на завтра.\n'
+        'Принимет два необязательных аргумента в любой последовательности.\n'
+        '[день] = \'сегодня\', \'завтра\'\n'
+        '[группа] = Группы ЧЭМК\n'
+        '\n/hyb [день] [группа] - Расписание с заменами. По умолчанию возвращает расписание группы Пр1-15 на завтра\n'
+        'Принимает два необязательных аргумента в любой последовательности.\n'
+        '[день] = \'сегодня\', \'завтра\'\n'
+        '[группа] = Группы ЧЭМК. На данный момент только Пр1-15')
 
 def sch(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
@@ -26,20 +43,39 @@ def sch(bot, update, args):
         day = args[0].lower()
     update.message.reply_text(schedule.getSchedule(day))
 
-def rep(bot, update, args):
+def hyb(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
                        action=ChatAction.TYPING)
     gr = "пр1-15"
-    time = "tomorrow"
+    time = "завтра"
     if len(args) == 2:
-        if args[0] == "tomorrow" or args[0] == "today":
+        if args[0] == "завтра" or args[0] == "сегодня":
             time = args[0]
             gr = args[1]
         else:
             time = args[1]
             gr = args[0]
     elif len(args) == 1:
-        if args[0] == "tomorrow" or args[0] == "today":
+        if args[0] == "завтра" or args[0] == "сегодня":
+            time = args[0]
+        else:
+            gr = args[0]
+    update.message.reply_text(hybrid.getHybrid(gr,time))
+    
+def rep(bot, update, args):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    gr = "пр1-15"
+    time = "завтра"
+    if len(args) == 2:
+        if args[0] == "завтра" or args[0] == "сегодня":
+            time = args[0]
+            gr = args[1]
+        else:
+            time = args[1]
+            gr = args[0]
+    elif len(args) == 1:
+        if args[0] == "завтра" or args[0] == "сегодня":
             time = args[0]
         else:
             gr = args[0]
@@ -60,13 +96,14 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
+    # on different commands
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("rep", rep, pass_args=True))
     dp.add_handler(CommandHandler("sch", sch, pass_args=True))
-    
-    # on noncommand i.e message - echo the message on Telegram
+    dp.add_handler(CommandHandler("hyb", hyb, pass_args=True))
+    dp.add_handler(CommandHandler("command", command, pass_args=True))
+    # on noncommand
     dp.add_handler(MessageHandler(Filters.text, echo))
 
     # log all errors
