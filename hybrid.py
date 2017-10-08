@@ -9,6 +9,8 @@ def getHybrid(group = "пр1-15", day = "завтра"):
         return zamen[0]
     elif zamen[0] == "Нет замен.":
         return schedule.getSchedule(day)
+    elif zamen[0] == "Сервер недоступен.":
+        return zamen[0]
     if rsps[0] == "Пятница":
         if replacements.getStar("tomorrow") == 1:
             del rsps[3]

@@ -83,7 +83,14 @@ def rep(bot, update, args):
     
 def echo(bot, update):
     #update.message.reply_text(update.message.text)
-    update.message.reply_text(answers.getAnswer(update.message.text))
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    ans = answers.getAnswer(update.message.text)
+    for i in range(0, len(ans), 2):
+        update.message.reply_text(ans[i] + ans[i + 1])
+        if i > 10:
+            update.message.reply_text("Очень много ответов. Задайте более точный вопрос.")
+            break
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))

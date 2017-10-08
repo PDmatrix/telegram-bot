@@ -8,7 +8,10 @@ def getStar(day = "завтра"):
         day = "tomorrow"
     elif day == "сегодня":
         day = "today"
-    site = requests.get("http://wwwold.chemk.org/student/raspisanie/4korp/{}.htm".format(day))
+    try:
+        site = requests.get("http://wwwold.chemk.org/student/raspisanie/4korp/{}.htm".format(day))
+    except Exception:
+        return "Сервер недоступен."
     cont = site.content
     soup = BeautifulSoup(cont, 'html.parser')
     if len(soup.find_all("tr")[0].p.text) != 49:
@@ -26,7 +29,10 @@ def findChange(group = "пр1-15", day = "завтра"):
         day = "tomorrow"
     elif day == "сегодня":
         day = "today"
-    site = requests.get("http://wwwold.chemk.org/student/raspisanie/4korp/{}.htm".format(day))
+    try:
+        site = requests.get("http://wwwold.chemk.org/student/raspisanie/4korp/{}.htm".format(day))
+    except Exception:
+        return "Сервер недоступен."
     cont = site.content
     soup = BeautifulSoup(cont, 'html.parser')
     lines = soup.find_all("tr")

@@ -9,6 +9,7 @@ def getAnswer(question):
             answers.append(questions[i])
             answers.append(questions[i + 1])
     result = ""
+    return answers
     num = 0
     for ns in answers:
         result = result + ns;
@@ -17,5 +18,7 @@ def getAnswer(question):
         num = num + 1
     if result == "":
         result = "Вопрос не найден."
+
     f.close()
     return result
+#print(getAnswer("база"))
