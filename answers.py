@@ -9,6 +9,7 @@ def getAnswer(question):
             answers.append(questions[i])
             answers.append(questions[i + 1])
     result = ""
+    f.close()
     return answers
     num = 0
     for ns in answers:

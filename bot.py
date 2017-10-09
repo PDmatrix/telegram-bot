@@ -92,7 +92,7 @@ def echo(bot, update):
             update.message.reply_text("Очень много ответов. Задайте более точный вопрос.")
             break
     if len(ans) == 0:
-        update.message.reply_text(ans[0])
+        update.message.reply_text("Вопрос не найден.")
 
 
 def error(bot, update, error):
