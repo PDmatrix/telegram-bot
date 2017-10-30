@@ -65,6 +65,9 @@ def findChange(group = "пр1-15", day = "завтра"):
                 if ans[0] == u'\xa0' and ans[2] == u'\xa0' and ans[4] == u'\xa0': 
                     break
                 #Удаление первого символа
+                
+                if ans[0] == u'\xa0':
+                    ans = ans[2:]
                 if ans[0] == u'\xa0':
                     ans = ans[2:]
 
@@ -92,4 +95,4 @@ def findChange(group = "пр1-15", day = "завтра"):
     if ans2 == "":
         return "Нет замен."
 #print(getStar("today"))
-#print(findChange("пр1-15","сегодня"))
+#print(findChange("пр1-15","завтра"))

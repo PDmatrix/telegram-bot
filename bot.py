@@ -1,6 +1,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
-import logging, answers, replacements, schedule, os, hybrid
+import logging, answers, replacements, schedule, os, hybrid, zvonki
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -94,6 +94,19 @@ def echo(bot, update):
     if len(ans) == 0:
         update.message.reply_text("Вопрос не найден.")
 
+##def end(bot, job):
+##    """Send the alarm message."""
+##    bot.send_message(job.context, text='10 минут до конца пары!')
+    
+##def setZv(bot, update, job_queue, chat_data):
+##    """Add a job to the queue."""
+##    chat_id = update.message.chat_id
+##    # Add job to queue
+##
+##    job = job_queue.run_once(end, 1, context=chat_id)
+##    chat_data['job'] = job
+##    jo = job_queue.run_once(end, 1, context=chat_id)
+##    chat_data['job'] = jo
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -113,6 +126,8 @@ def main():
     dp.add_handler(CommandHandler("sch", sch, pass_args=True))
     dp.add_handler(CommandHandler("hyb", hyb, pass_args=True))
     dp.add_handler(CommandHandler("command", command, pass_args=True))
+##    dp.add_handler(CommandHandler("set", setZv, pass_job_queue=True, pass_chat_data=True))
+##    dp.add_handler(CommandHandler("end", end, pass_job_queue=True, pass_chat_data=True))
     # on noncommand
     dp.add_handler(MessageHandler(Filters.text, echo))
 
