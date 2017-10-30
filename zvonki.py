@@ -37,6 +37,5 @@ def when_para_start(para_num):
 	return remaining
 #print(datetime.strptime(when_para_start(1), "%H:%M"))
 #print('Время: {}'.format(datetime.strftime(current_time(), "%H:%M")))
-#
 #print('Осталось {} пары'.format(get_para_num()))
 #print('До конца пары {} ч.'.format(when_para_ends(get_para_num())))
