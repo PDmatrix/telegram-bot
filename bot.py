@@ -94,19 +94,39 @@ def echo(bot, update):
     if len(ans) == 0:
         update.message.reply_text("Вопрос не найден.")
 
-##def end(bot, job):
-##    """Send the alarm message."""
-##    bot.send_message(job.context, text='10 минут до конца пары!')
+def note(bot, job):
+    """Send the alarm message."""
+    global ss
+    if replacements.findChange("пр1-15","завтра") != ss:
+        bot.send_message(job.context, text=ss)
+        ss = replacements.findChange("пр1-15","завтра")
     
-##def setZv(bot, update, job_queue, chat_data):
-##    """Add a job to the queue."""
-##    chat_id = update.message.chat_id
-##    # Add job to queue
-##
-##    job = job_queue.run_once(end, 1, context=chat_id)
-##    chat_data['job'] = job
-##    jo = job_queue.run_once(end, 1, context=chat_id)
-##    chat_data['job'] = jo
+#
+#
+#       TODO: Разныеы аккануты, запоминание таймеров. Чекер для таймеров. Поставить уведомления только для новых замен
+#
+#
+
+def setNote(bot, update, job_queue, chat_data):  
+    """Add a job to the queue."""
+    chat_id = update.message.chat_id
+    # Add job to queue
+    global ss
+    job = job_queue.run_repeating(note, interval=60, context=chat_id)
+    chat_data['job'] = job
+    update.message.reply_text('Таймер на уведомление установлен!')
+    ss = replacements.findChange("пр1-15","завтра")
+    
+
+def unsetNote(bot, update, chat_data):
+    """Remove the job if the user changed their mind."""
+    if 'job' not in chat_data:
+        update.message.reply_text('Таймер не установлен')
+        return
+    job = chat_data['job']
+    job.schedule_removal()
+    del chat_data['job']
+    update.message.reply_text('Таймер удалён!')
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -126,8 +146,8 @@ def main():
     dp.add_handler(CommandHandler("sch", sch, pass_args=True))
     dp.add_handler(CommandHandler("hyb", hyb, pass_args=True))
     dp.add_handler(CommandHandler("command", command, pass_args=True))
-##    dp.add_handler(CommandHandler("set", setZv, pass_job_queue=True, pass_chat_data=True))
-##    dp.add_handler(CommandHandler("end", end, pass_job_queue=True, pass_chat_data=True))
+    dp.add_handler(CommandHandler("set", setNote, pass_job_queue=True, pass_chat_data=True))
+    dp.add_handler(CommandHandler("unset", unsetNote, pass_chat_data=True))
     # on noncommand
     dp.add_handler(MessageHandler(Filters.text, echo))
 
