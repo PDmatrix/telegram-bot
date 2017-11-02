@@ -129,6 +129,15 @@ def unsetNote(bot, update, chat_data):
     del chat_data['job']
     update.message.reply_text('Таймер удалён!')
 
+def chekNote(bot, update, chat_data):
+    """Remove the job if the user changed their mind."""
+    if 'job' not in chat_data:
+        update.message.reply_text('Таймер не установлен')
+        return
+    else:
+        update.message.reply_text('Таймер установлен')
+        return
+    
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
@@ -149,6 +158,7 @@ def main():
     dp.add_handler(CommandHandler("command", command, pass_args=True))
     dp.add_handler(CommandHandler("set", setNote, pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("unset", unsetNote, pass_chat_data=True))
+    dp.add_handler(CommandHandler("check", checkNote, pass_chat_data=True))
     # on noncommand
     dp.add_handler(MessageHandler(Filters.text, echo))
 
