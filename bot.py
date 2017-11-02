@@ -129,7 +129,7 @@ def unsetNote(bot, update, chat_data):
     del chat_data['job']
     update.message.reply_text('Таймер удалён!')
 
-def chekNote(bot, update, chat_data):
+def checkNote(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
     if 'job' not in chat_data:
         update.message.reply_text('Таймер не установлен')
