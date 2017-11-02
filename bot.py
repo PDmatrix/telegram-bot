@@ -97,14 +97,15 @@ def echo(bot, update):
 def note(bot, job):
     """Send the alarm message."""
     global ss
-    if replacements.findChange("пр1-15","завтра") != ss:
-        ss = replacements.findChange("пр1-15","завтра")
+    rp = replacements.findChange("пр1-15","завтра")
+    if rp != ss and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную.":
+        ss = rp
         bot.send_message(job.context, text=ss)
 
     
 #
 #
-#       TODO: Разныеы аккануты, запоминание таймеров. Чекер для таймеров. Поставить уведомления только для новых замен
+#       TODO: Разные аккануты, запоминание таймеров.
 #
 #
 
