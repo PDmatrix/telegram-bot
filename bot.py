@@ -1,6 +1,8 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
-import logging, answers, replacements, schedule, os, hybrid, zvonki
+import logging, answers, replacements, schedule, os, hybrid, zvonki, sys,subprocess
+import sqlite3
+from threading import Thread
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -12,7 +14,28 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
-    update.message.reply_text('Hi!')
+    update.message.reply_text(
+        'Добро пожаловать!\n'
+        'Для получения информации введите /help\n'
+        'Для получения комманд введите /command')
+    conn = sqlite3.connect('date\dbase.db')
+    cursor = conn.cursor()
+    userid = update.effective_user.id
+    username = update.effective_user.username
+    cursor.execute("SELECT id FROM users")
+    here = cursor.fetchall()
+    try:
+        if userid not in here[:][0]:
+            cursor.execute("INSERT INTO users ('№','id','name','note') VALUES (NULL,:id,:name,0)",{"id" : userid, "name" : username})
+            conn.commit()
+    except IndexError:
+        cursor.execute("INSERT INTO users ('№','id','name','note') VALUES (NULL,:id,:name,0)",{"id" : userid, "name" : username})
+        conn.commit()
+    #cursor.execute("SELECT test FROM yoboi")
+    #results = cursor.fetchall()
+    #print(results)
+    conn.close()
+
 
 
 def help(bot, update):
@@ -82,7 +105,6 @@ def rep(bot, update, args):
     update.message.reply_text(replacements.findChange(gr,time))
     
 def echo(bot, update):
-    #update.message.reply_text(update.message.text)
     bot.sendChatAction(chat_id=update.message.chat_id,
                        action=ChatAction.TYPING)
     ans = answers.getAnswer(update.message.text)
@@ -106,6 +128,7 @@ def note(bot, job):
 #
 #
 #       TODO: Разные аккануты, запоминание таймеров.
+#       Ввод расписания в базу данных. Добавление других групп
 #
 #
 
@@ -118,7 +141,12 @@ def setNote(bot, update, job_queue, chat_data):
     chat_data['job'] = job
     update.message.reply_text('Таймер на уведомление установлен!')
     ss = replacements.findChange("пр1-15","завтра")
-    
+    conn = sqlite3.connect('date\dbase.db')
+    cursor = conn.cursor()
+    userid = update.effective_user.id
+    cursor.execute("UPDATE users SET note = 1 WHERE id = :id",{"id" : userid})
+    conn.commit()
+    conn.close()
 
 def unsetNote(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
@@ -129,6 +157,12 @@ def unsetNote(bot, update, chat_data):
     job.schedule_removal()
     del chat_data['job']
     update.message.reply_text('Таймер удалён!')
+    conn = sqlite3.connect('date\dbase.db')
+    cursor = conn.cursor()
+    userid = update.effective_user.id
+    cursor.execute("UPDATE users SET note = 0 WHERE id = :id",{"id" : userid})
+    conn.commit()
+    conn.close()
 
 def checkNote(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
@@ -149,7 +183,6 @@ def main():
     updater = Updater(TOKEN)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
-
     # on different commands
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
@@ -165,9 +198,19 @@ def main():
 
     # log all errors
     dp.add_error_handler(error)
+    def stop_and_restart():
+        """Gracefully stop the Updater and replace the current process with a new one"""
+        updater.stop()
+        #os.execl(sys.executable, [sys.executable] +sys.argv)
+        subprocess.call(["python", os.path.join(sys.path[0], __file__)] + sys.argv[1:])
+        #print("done")
 
+    def restart(bot, update):
+        update.message.reply_text('Бот перезапускается...')
+        Thread(target=stop_and_restart).start()
+
+    dp.add_handler(CommandHandler('rs', restart, filters=Filters.user(username='@Dmatrix')))
     # Start the Bot
-
     updater.start_polling()
     #WEBHOOK HEROKU
     #updater.start_webhook(listen="0.0.0.0", port = PORT, url_path = TOKEN)
@@ -178,7 +221,7 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
-
+    
 
 if __name__ == '__main__':
     main()
