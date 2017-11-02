@@ -98,8 +98,9 @@ def note(bot, job):
     """Send the alarm message."""
     global ss
     if replacements.findChange("пр1-15","завтра") != ss:
-        bot.send_message(job.context, text=ss)
         ss = replacements.findChange("пр1-15","завтра")
+        bot.send_message(job.context, text=ss)
+
     
 #
 #
