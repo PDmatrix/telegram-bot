@@ -120,7 +120,7 @@ def note(bot, job):
     """Send the alarm message."""
     global ss
     rp = replacements.findChange("пр1-15","завтра")
-    if rp != ss and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную.":
+    if rp != ss and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную." and rp != "Расписание не готово.":
         ss = rp
         bot.send_message(job.context, text=ss)
 
