@@ -1,7 +1,8 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
 from threading import Thread
-import logging, answers, replacements, schedule, os, hybrid, zvonki, sys, subprocess, urlparse, psycopg2
+from urllib.parse import urlparse
+import logging, answers, replacements, schedule, os, hybrid, zvonki, sys, subprocess, psycopg2
 import sqlite3
 
 
