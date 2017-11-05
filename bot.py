@@ -39,7 +39,7 @@ def start(bot, update):
     ##conn.close()
     parse.uses_netloc.append("postgres")
     database_url = "postgres://msmaczglsjzrfs:22669c191b529b660d646dd7a24ddec13e7106aff05136dd9a14a312d9f41626@ec2-50-17-217-166.compute-1.amazonaws.com:5432/d7e3aei0ooalaa"
-    url = parse.urlparse(os.environ[database_url])
+    url = parse.urlparse(os.environ["DATABASE_URL"])
     conn = psycopg2.connect(
         database=url.path[1:],
         user=url.username,
