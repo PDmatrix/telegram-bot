@@ -18,7 +18,7 @@ def start(bot, update):
         'Добро пожаловать!\n'
         'Для получения информации введите /help\n'
         'Для получения комманд введите /command')
-    conn = sqlite3.connect('date\dbase.db')
+    conn = sqlite3.connect('userinfo.db')
     cursor = conn.cursor()
     userid = update.effective_user.id
     username = update.effective_user.username
@@ -141,7 +141,7 @@ def setNote(bot, update, job_queue, chat_data):
     chat_data['job'] = job
     update.message.reply_text('Таймер на уведомление установлен!')
     ss = replacements.findChange("пр1-15","завтра")
-    conn = sqlite3.connect('date\dbase.db')
+    conn = sqlite3.connect('userinfo.db')
     cursor = conn.cursor()
     userid = update.effective_user.id
     cursor.execute("UPDATE users SET note = 1 WHERE id = :id",{"id" : userid})
@@ -157,7 +157,7 @@ def unsetNote(bot, update, chat_data):
     job.schedule_removal()
     del chat_data['job']
     update.message.reply_text('Таймер удалён!')
-    conn = sqlite3.connect('date\dbase.db')
+    conn = sqlite3.connect('userinfo.db')
     cursor = conn.cursor()
     userid = update.effective_user.id
     cursor.execute("UPDATE users SET note = 0 WHERE id = :id",{"id" : userid})
