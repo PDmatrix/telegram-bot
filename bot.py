@@ -1,8 +1,9 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
-import logging, answers, replacements, schedule, os, hybrid, zvonki, sys,subprocess
-import sqlite3
 from threading import Thread
+import logging, answers, replacements, schedule, os, hybrid, zvonki, sys, subprocess, urlparse, psycopg2
+import sqlite3
+
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,24 +19,38 @@ def start(bot, update):
         'Добро пожаловать!\n'
         'Для получения информации введите /help\n'
         'Для получения комманд введите /command')
-    conn = sqlite3.connect('userinfo.db')
-    cursor = conn.cursor()
-    userid = update.effective_user.id
-    username = update.effective_user.username
-    cursor.execute("SELECT id FROM users")
-    here = cursor.fetchall()
-    try:
-        if userid not in here[:][0]:
-            cursor.execute("INSERT INTO users ('№','id','name','note') VALUES (NULL,:id,:name,0)",{"id" : userid, "name" : username})
-            conn.commit()
-    except IndexError:
-        cursor.execute("INSERT INTO users ('№','id','name','note') VALUES (NULL,:id,:name,0)",{"id" : userid, "name" : username})
-        conn.commit()
+    ##conn = sqlite3.connect('userinfo.db')
+    ##cursor = conn.cursor()
+    ##userid = update.effective_user.id
+    ##username = update.effective_user.username
+    ##cursor.execute("SELECT id FROM users")
+    ##here = cursor.fetchall()
+    ##try:
+        ##if userid not in here[:][0]:
+            ##cursor.execute("INSERT INTO users ('№','id','name','note') VALUES (NULL,:id,:name,0)",{"id" : userid, "name" : username})
+            ##conn.commit()
+    ##except IndexError:
+        ##cursor.execute("INSERT INTO users ('№','id','name','note') VALUES (NULL,:id,:name,0)",{"id" : userid, "name" : username})
+        ##conn.commit()
     #cursor.execute("SELECT test FROM yoboi")
     #results = cursor.fetchall()
     #print(results)
+    ##conn.close()
+    urlparse.uses_netloc.append("postgres")
+    database_url = "postgres://msmaczglsjzrfs:22669c191b529b660d646dd7a24ddec13e7106aff05136dd9a14a312d9f41626@ec2-50-17-217-166.compute-1.amazonaws.com:5432/d7e3aei0ooalaa"
+    url = urlparse.urlparse(os.environ[database_url])
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE users (num INTEGER PRIMARY KEY AUTOINCREMENT, id INTEGER, username TEXT);")
+    conn.commit()
+    cur.close()
     conn.close()
-
 
 
 def help(bot, update):
