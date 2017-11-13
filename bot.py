@@ -212,7 +212,7 @@ def main():
     url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
     tok = dbQuery("SELECT token FROM auth")
     headers = {'Accept': 'application/vnd.heroku+json; version=3',
-                'Authorization': 'Bearer {}'.format(tok[0])}
+                'Authorization': 'Bearer {}'.format(tok[0][0])}
     rep = requests.get(url, headers = headers)
     # Create the EventHandler and pass it your bot's token.
     TOKEN = rep.json()['TOKEN']
