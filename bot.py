@@ -3,6 +3,7 @@ from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageConte
 from threading import Thread
 from urllib import parse
 import logging, answers, replacements, schedule, os, hybrid, zvonki, sys, subprocess, psycopg2, requests
+import sarge
 import sqlite3
 
 
@@ -210,8 +211,9 @@ def onStart(bot, chat_data, job_queue):
 
 def main():
     url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
+    r = sarge.capture_stdout('heroku auth:token')
     headers = {'Accept': 'application/vnd.heroku+json; version=3',
-                'Authorization': 'Bearer 42cb82a9-5d59-4c9e-b1ce-afbc3a85c169'}
+                'Authorization': 'Bearer {}'.format(r.stdout.text)}
     rep = requests.get(url, headers = headers)
     # Create the EventHandler and pass it your bot's token.
     TOKEN = rep.json()['TOKEN']
