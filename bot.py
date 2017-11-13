@@ -22,7 +22,7 @@ def start(bot, update, job_queue, chat_data):
         'Для получения комманд введите /command')
     regUser(update.effective_user.id, update.effective_user.username)
 
-def dbQuery(query):
+def dbQuery(query, *args):
     try:
         parse.uses_netloc.append("postgres")
         dataurl = "postgres://msmaczglsjzrfs:22669c191b529b660d646dd7a24ddec13e7106aff05136dd9a14a312d9f41626@ec2-50-17-217-166.compute-1.amazonaws.com:5432/d7e3aei0ooalaa"
@@ -35,7 +35,7 @@ def dbQuery(query):
             port=url.port
         )
         cur = conn.cursor()
-        cur.execute(query)
+        cur.execute(query, args)
         try:
             result = cur.fetchall()
         except:
@@ -78,9 +78,9 @@ def regUser(userid, username):
     here = dbQuery("SELECT id FROM users")
     try:
         if userid not in here[:][0]:
-            dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)" % (userid,username))
+            dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)",userid,username)
     except IndexError:
-        dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)" % (userid,username))
+        dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)", userid,username)
 
 def sch(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
@@ -165,7 +165,7 @@ def setNote(bot, update, job_queue, chat_data):
     chat_data['job'] = job
     update.message.reply_text('Таймер на уведомление установлен!')
     ss = replacements.findChange("пр1-15","завтра")
-    dbQuery("UPDATE users SET note = 1 WHERE id = %s" % (chat_id))
+    dbQuery("UPDATE users SET note = 1 WHERE id = %s" , (chat_id))
 
 def unsetNote(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
@@ -177,7 +177,7 @@ def unsetNote(bot, update, chat_data):
     job.schedule_removal()
     del chat_data['job']
     update.message.reply_text('Таймер удалён!')
-    dbQuery("UPDATE users SET note = 0 WHERE id = %s" % (chat_id))
+    dbQuery("UPDATE users SET note = 0 WHERE id = %s" , (chat_id))
 
 def checkNote(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
