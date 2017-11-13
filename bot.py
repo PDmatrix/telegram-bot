@@ -25,7 +25,8 @@ def start(bot, update, job_queue, chat_data):
 def dbQuery(query, *args):
     try:
         url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
-        headers = {'Accept': 'application/vnd.heroku+json; version=3'}
+        headers = {'Accept': 'application/vnd.heroku+json; version=3',
+                'Authorization': 'Bearer 42cb82a9-5d59-4c9e-b1ce-afbc3a85c169'}
         rep = requests.get(url, headers = headers)
         parse.uses_netloc.append("postgres")
         dataurl = rep.json()['postgresurl']
@@ -209,7 +210,8 @@ def onStart(bot, chat_data, job_queue):
 
 def main():
     url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
-    headers = {'Accept': 'application/vnd.heroku+json; version=3'}
+    headers = {'Accept': 'application/vnd.heroku+json; version=3',
+                'Authorization': 'Bearer 42cb82a9-5d59-4c9e-b1ce-afbc3a85c169'}
     rep = requests.get(url, headers = headers)
     # Create the EventHandler and pass it your bot's token.
     TOKEN = rep.json()['TOKEN']
