@@ -2,7 +2,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, JobQu
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent, Bot
 from threading import Thread
 from urllib import parse
-import logging, answers, replacements, schedule, os, hybrid, zvonki, sys, subprocess, psycopg2
+import logging, answers, replacements, schedule, os, hybrid, zvonki, sys, subprocess, psycopg2, requests
 import sqlite3
 
 
@@ -24,8 +24,11 @@ def start(bot, update, job_queue, chat_data):
 
 def dbQuery(query, *args):
     try:
+        url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
+        headers = {'Accept': 'application/vnd.heroku+json; version=3'}
+        rep = requests.get(url, headers = headers)
         parse.uses_netloc.append("postgres")
-        dataurl = "postgres://msmaczglsjzrfs:22669c191b529b660d646dd7a24ddec13e7106aff05136dd9a14a312d9f41626@ec2-50-17-217-166.compute-1.amazonaws.com:5432/d7e3aei0ooalaa"
+        dataurl = rep.json()['postgresurl']
         url = parse.urlparse(dataurl)
         conn = psycopg2.connect(
             database=url.path[1:],
@@ -205,8 +208,11 @@ def onStart(bot, chat_data, job_queue):
         
 
 def main():
+    url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
+    headers = {'Accept': 'application/vnd.heroku+json; version=3'}
+    rep = requests.get(url, headers = headers)
     # Create the EventHandler and pass it your bot's token.
-    TOKEN = "462202131:AAETYcmO8qi2m1SaQzs-zzqC_ycRHOqXG14"
+    TOKEN = rep.json()['TOKEN']
     #PORT = int(os.environ.get('PORT', '5000'))
     updater = Updater(TOKEN)
     bt = Bot(TOKEN)
