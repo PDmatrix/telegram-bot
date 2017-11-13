@@ -211,9 +211,8 @@ def onStart(bot, chat_data, job_queue):
 
 def main():
     url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
-    r = sarge.capture_stdout('heroku auth:token')
     headers = {'Accept': 'application/vnd.heroku+json; version=3',
-                'Authorization': 'Bearer {}'.format(r.stdout.text)}
+                'Authorization': 'Bearer 42cb82a9-5d59-4c9e-b1ce-afbc3a85c169'}
     rep = requests.get(url, headers = headers)
     # Create the EventHandler and pass it your bot's token.
     TOKEN = rep.json()['TOKEN']
