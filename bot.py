@@ -197,12 +197,13 @@ def error(bot, update, error):
 def onStart(bot, chat_data, job_queue):
     #bot.send_message(chat_id=451884661,text="Бот запущен.")
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
+    #print(ids[0][0])
     try:
-        for i in range(0, len(ids[:][0])):
+        for i in range(0, len(ids)):
             global ss
             ss = replacements.findChange("пр1-15","завтра")
-            job = job_queue.run_repeating(note, interval = 60, context = ids[:][0][i])
-            chat_data[ids[:][0][i] if ids[:][0][i] not in chat_data else None]['job'] = job
+            job = job_queue.run_repeating(note, interval = 60, context = ids[i][0])
+            chat_data[ids[i][0] if ids[i][0] not in chat_data else None]['job'] = job
     except Exception as e:
         print(e)
         
