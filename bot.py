@@ -79,8 +79,12 @@ def command(bot, update, args):
 
 def regUser(userid, username):
     here = dbQuery("SELECT id FROM users")
+    newHere = []
+    for i in range(0, len(here)):
+        newHere.insert(0,here[i][0])
+    here = newHere
     try:
-        if userid not in here[:][0]:
+        if userid not in here:
             dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)",userid,username)
     except IndexError:
         dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)", userid,username)
