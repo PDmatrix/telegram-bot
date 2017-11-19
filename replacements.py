@@ -16,9 +16,9 @@ def getStar(day = "завтра"):
     soup = BeautifulSoup(cont, 'html.parser')
     lun = 0
     ne = False
-    if len(soup.find_all("tr")[0].p.text) != 49:
+    if len(soup.find_all("tr")[0].p.text) != 49 or len(soup.find_all("tr")[0].p.text) != 46:
         for i in range(0, len(soup.find_all("tr"))):
-            if len(soup.find_all("tr")[i].p.text) == 49:
+            if len(soup.find_all("tr")[i].p.text) == 49 or len(soup.find_all("tr")[i].p.text) == 46:
                 lun = i
                 ne = True
                 break
@@ -49,10 +49,10 @@ def findChange(group = "пр1-15", day = "завтра"):
         return "Расписание не готово."
     lun = 0
     ne = False
-    if len(lines[0].p.text) != 49:
+    if len(lines[0].p.text) != 49 or len(lines[0].p.text) != 46:
         #
         for i in range(0, len(lines)):
-            if len(lines[i].p.text) == 49:
+            if len(lines[i].p.text) == 49 or len(lines[i].p.text) == 46:
                 lun = i
                 ne = True
                 break

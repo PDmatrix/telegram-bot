@@ -206,6 +206,7 @@ def onStart(bot, chat_data, job_queue):
         for i in range(0, len(ids)):
             global ss
             ss = replacements.findChange("пр1-15","завтра")
+            print(ids[i][0])
             job = job_queue.run_repeating(note, interval = 60, context = ids[i][0])
             chat_data[ids[i][0] if ids[i][0] not in chat_data else None]['job'] = job
     except Exception as e:
