@@ -167,8 +167,7 @@ def note(bot, job):
         except Exception as e:
           print(e)
         ss = rp
-       
-
+        
 def setNote(bot, update, job_queue, chat_data):  
     """Add a job to the queue."""
     chat_id = update.message.chat_id
@@ -205,16 +204,14 @@ def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 def onStart(bot, chat_data, job_queue):
-    global ss
-    ss = "PIDOR"
     #bot.send_message(chat_id=451884661,text="Бот запущен.")
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
     #print(ids[0][0])
     try:
         for i in range(0, len(ids)):
             global ss
-            ss = replacements.findChange("пр1-15","завтра")
-            print(ids[i][0])
+            #ss = replacements.findChange("пр1-15","завтра")
+            ss = "PIDOR"
             job = job_queue.run_repeating(note, interval = 60, context = ids[i][0])
             chat_data[ids[i][0] if ids[i][0] not in chat_data else None]['job'] = job
     except Exception as e:
