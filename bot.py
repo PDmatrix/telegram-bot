@@ -164,9 +164,9 @@ def note(bot, job):
         try:
           for i in range(0, len(ids)):
             bot.send_message(ids[i][0], text=ss)
-       except Exception as e:
+        except Exception as e:
           print(e)
-       ss = rp
+        ss = rp
        
 
 def setNote(bot, update, job_queue, chat_data):  
