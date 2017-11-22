@@ -160,8 +160,14 @@ def note(bot, job):
     global ss
     rp = replacements.findChange("пр1-15","завтра")
     if rp != ss and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную." and rp != "Расписание не готово.":
-        ss = rp
-        bot.send_message(job.context, text=ss)
+        ids = dbQuery("SELECT id FROM users WHERE note = 1")
+        try:
+          for i in range(0, len(ids)):
+            bot.send_message(ids[i][0], text=ss)
+       except Exception as e:
+          print(e)
+       ss = rp
+       
 
 def setNote(bot, update, job_queue, chat_data):  
     """Add a job to the queue."""
@@ -199,6 +205,8 @@ def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 def onStart(bot, chat_data, job_queue):
+    global ss
+    ss = "PIDOR"
     #bot.send_message(chat_id=451884661,text="Бот запущен.")
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
     #print(ids[0][0])
