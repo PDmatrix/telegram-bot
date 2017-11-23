@@ -26,7 +26,7 @@ def dbQuery(query, *args):
     try:
         parse.uses_netloc.append("postgres")
         #dataurl = elems.json()['DATABASE_URL']
-        dataurl = "postgres://msmaczglsjzrfs:22669c191b529b660d646dd7a24ddec13e7106aff05136dd9a14a312d9f41626@ec2-50-17-217-166.compute-1.amazonaws.com:5432/d7e3aei0ooalaa"
+        dataurl = os.environ.get('DATABASE_URL')
         url = parse.urlparse(dataurl)
         conn = psycopg2.connect(
             database=url.path[1:],
@@ -204,7 +204,6 @@ def error(bot, update, error):
 def onStart(bot, chat_data, job_queue):
     #bot.send_message(chat_id=451884661,text="Бот запущен.")
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
-    print(os.environ.get('TOKEN'))
     #print(ids[0][0])
     try:
         for i in range(0, len(ids)):
@@ -217,13 +216,13 @@ def onStart(bot, chat_data, job_queue):
         
 
 def main():
-    url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
-    tok = dbQuery("SELECT token FROM auth")
-    headers = {'Accept': 'application/vnd.heroku+json; version=3',
-                'Authorization': 'Bearer {}'.format(tok[0][0])}
-    elems = requests.get(url, headers = headers)
+    #url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
+    #tok = dbQuery("SELECT token FROM auth")
+    #headers = {'Accept': 'application/vnd.heroku+json; version=3',
+    #            'Authorization': 'Bearer {}'.format(tok[0][0])}
+    #elems = requests.get(url, headers = headers)
         # Create the EventHandler and pass it your bot's token.
-    TOKEN = elems.json()['TOKEN']
+    TOKEN = os.environ.get('TOKEN')
     #PORT = int(os.environ.get('PORT', '5000'))
     updater = Updater(TOKEN)
     bt = Bot(TOKEN)
