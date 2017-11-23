@@ -163,7 +163,7 @@ def note(bot, job):
         ids = dbQuery("SELECT id FROM users WHERE note = 1")
         try:
           for i in range(0, len(ids)):
-            bot.send_message(ids[i][0], text=ss)
+            bot.send_message(ids[i][0], text = rp)
         except Exception as e:
           print(e)
         ss = rp
