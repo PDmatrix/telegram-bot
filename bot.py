@@ -24,8 +24,6 @@ def start(bot, update, job_queue, chat_data):
 
 def dbQuery(query, *args):
     try:
-
-        
         parse.uses_netloc.append("postgres")
         #dataurl = elems.json()['DATABASE_URL']
         dataurl = "postgres://msmaczglsjzrfs:22669c191b529b660d646dd7a24ddec13e7106aff05136dd9a14a312d9f41626@ec2-50-17-217-166.compute-1.amazonaws.com:5432/d7e3aei0ooalaa"
@@ -206,6 +204,7 @@ def error(bot, update, error):
 def onStart(bot, chat_data, job_queue):
     #bot.send_message(chat_id=451884661,text="Бот запущен.")
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
+    print(os.environ.get('TOKEN'))
     #print(ids[0][0])
     try:
         for i in range(0, len(ids)):
