@@ -22,4 +22,3 @@ def getAnswer(question):
 
     f.close()
     return result
-#print(getAnswer("база"))

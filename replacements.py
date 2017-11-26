@@ -2,7 +2,7 @@ import requests
 import re
 from bs4 import BeautifulSoup
 
-
+#Функция получения недели(четная или нечётная)
 def getStar(day = "завтра"):
     if day == "завтра":
         day = "tomorrow"
@@ -32,6 +32,7 @@ def getStar(day = "завтра"):
         star = 2
     return star
 
+#Функция поиска замен
 def findChange(group = "пр1-15", day = "завтра"):
     if day == "завтра":
         day = "tomorrow"
@@ -89,10 +90,6 @@ def findChange(group = "пр1-15", day = "завтра"):
                 if ans[0] == u'\xa0':
                     ans = ans[2:]
 
-                #if l == 1:
-                    #return ans
-                #l += 1
-
                 #Удаление всех управляющийх символов
                 mpa = dict.fromkeys(range(32))
                 fin = ans.translate(mpa).split(";")
@@ -112,5 +109,3 @@ def findChange(group = "пр1-15", day = "завтра"):
             return lines[1].p.text.translate(mpa) + "\n" + ans2
     if ans2 == "":
         return "Нет замен."
-#print(getStar("завтра"))
-#print(findChange("Кс5-14","завтра"))

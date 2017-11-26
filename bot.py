@@ -2,19 +2,13 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, JobQu
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent, Bot
 from threading import Thread
 from urllib import parse
-import logging, answers, replacements, schedule, os, hybrid, zvonki, sys, subprocess, psycopg2, requests
-import sqlite3
+import answers, replacements, schedule, hybrid, zvonki
+import logging, os, sys, subprocess, psycopg2, requests
 
-
-# Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
-
 logger = logging.getLogger(__name__)
 
-
-# Define a few command handlers. These usually take the two arguments bot and
-# update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update, job_queue, chat_data):
     update.message.reply_text(
         'Добро пожаловать!\n'
@@ -25,7 +19,6 @@ def start(bot, update, job_queue, chat_data):
 def dbQuery(query, *args):
     try:
         parse.uses_netloc.append("postgres")
-        #dataurl = elems.json()['DATABASE_URL']
         dataurl = os.environ.get('DATABASE_URL')
         url = parse.urlparse(dataurl)
         conn = psycopg2.connect(
@@ -46,7 +39,6 @@ def dbQuery(query, *args):
         except:
             pass
     except psycopg2.ProgrammingError as e:
-        #e = sys.exc_info()[0]
         print('db error')
         print(e)
         result = None
@@ -154,7 +146,6 @@ def echo(bot, update):
     regUser(update.effective_user.id, update.effective_user.username)
 
 def note(bot, job):
-    """Send the alarm message."""
     global ss
     rp = replacements.findChange("пр1-15","завтра")
     if rp != ss and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную." and rp != "Расписание не готово.":
@@ -167,9 +158,7 @@ def note(bot, job):
         ss = rp
         
 def setNote(bot, update, job_queue, chat_data):  
-    """Add a job to the queue."""
     chat_id = update.message.chat_id
-    # Add job to queue
     global ss
     job = job_queue.run_repeating(note, interval=60, context=chat_id)
     chat_data['job'] = job
@@ -178,7 +167,6 @@ def setNote(bot, update, job_queue, chat_data):
     dbQuery("UPDATE users SET note = 1 WHERE id = %s" , (chat_id))
 
 def unsetNote(bot, update, chat_data):
-    """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     if 'job' not in chat_data:
         update.message.reply_text('Таймер не установлен')
@@ -190,7 +178,6 @@ def unsetNote(bot, update, chat_data):
     dbQuery("UPDATE users SET note = 0 WHERE id = %s" , (chat_id))
 
 def checkNote(bot, update, chat_data):
-    """Remove the job if the user changed their mind."""
     if 'job' not in chat_data:
         update.message.reply_text('Таймер не установлен')
         return
@@ -202,9 +189,7 @@ def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 def onStart(bot, chat_data, job_queue):
-    #bot.send_message(chat_id=451884661,text="Бот запущен.")
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
-    #print(ids[0][0])
     try:
         for i in range(0, len(ids)):
             global ss
@@ -213,23 +198,21 @@ def onStart(bot, chat_data, job_queue):
             chat_data[ids[i][0] if ids[i][0] not in chat_data else None]['job'] = job
     except Exception as e:
         print(e)
-        
+
+def stop_and_restart():
+        updater.stop()
+        subprocess.call(["python", os.path.join(sys.path[0], __file__)] + sys.argv[1:])
+
+def restart(bot, update):
+        update.message.reply_text('Бот перезапускается...')
+        Thread(target=stop_and_restart).start()
 
 def main():
-    #url = 'https://api.heroku.com/apps/telegrambotchemk/config-vars'
-    #tok = dbQuery("SELECT token FROM auth")
-    #headers = {'Accept': 'application/vnd.heroku+json; version=3',
-    #            'Authorization': 'Bearer {}'.format(tok[0][0])}
-    #elems = requests.get(url, headers = headers)
-        # Create the EventHandler and pass it your bot's token.
     TOKEN = os.environ.get('TOKEN')
-    #PORT = int(os.environ.get('PORT', '5000'))
     updater = Updater(TOKEN)
     bt = Bot(TOKEN)
-    # Get the dispatcher to register handlers
     dp = updater.dispatcher
     onStart(bt, dp.chat_data, dp.job_queue)
-    # on different commands
     dp.add_handler(CommandHandler("start", start,pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("rep", rep, pass_args=True))
@@ -239,34 +222,15 @@ def main():
     dp.add_handler(CommandHandler("set", setNote, pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("unset", unsetNote, pass_chat_data=True))
     dp.add_handler(CommandHandler("check", checkNote, pass_chat_data=True))
-    # on noncommand
-    dp.add_handler(MessageHandler(Filters.text, echo))
-    
-    # log all errors
-    dp.add_error_handler(error)
-    def stop_and_restart():
-        """Gracefully stop the Updater and replace the current process with a new one"""
-        updater.stop()
-        #os.execl(sys.executable, [sys.executable] +sys.argv)
-        subprocess.call(["python", os.path.join(sys.path[0], __file__)] + sys.argv[1:])
-        #print("done")
-    def restart(bot, update):
-        update.message.reply_text('Бот перезапускается...')
-        Thread(target=stop_and_restart).start()
 
     dp.add_handler(CommandHandler('rs', restart, filters=Filters.user(username='@Dmatrix')))
-    # Start the Bot
-    updater.start_polling()
-    #WEBHOOK HEROKU
-    #updater.start_webhook(listen="0.0.0.0", port = PORT, url_path = TOKEN)
-    #APPNAME = "telegrambotchemk"
-    #updater.bot.set_webhook("https://{}.herokuapp.com/".format(APPNAME) + TOKEN)
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
+    dp.add_handler(MessageHandler(Filters.text, echo))
+
+    dp.add_error_handler(error)
+
+    updater.start_polling()
     updater.idle()
     
-
 if __name__ == '__main__':
     main()
