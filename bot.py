@@ -4,6 +4,7 @@ from threading import Thread
 from urllib import parse
 import answers, replacements, schedule, hybrid, zvonki
 import logging, os, sys, subprocess, psycopg2, requests
+import telegram
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -229,7 +230,7 @@ def main():
     dp.add_handler(CommandHandler("check", checkNote, pass_chat_data=True))
     dp.add_handler(CommandHandler("today", today))
     dp.add_handler(CommandHandler("tomorrow", tomorrow))
-    
+
     dp.add_handler(CommandHandler('rs', restart, filters=Filters.user(username='@Dmatrix')))
 
     dp.add_handler(MessageHandler(Filters.text, echo))
