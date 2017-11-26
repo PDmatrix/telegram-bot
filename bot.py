@@ -184,6 +184,11 @@ def checkNote(bot, update, chat_data):
     else:
         update.message.reply_text('Таймер установлен')
         return
+
+def today(bot, update):
+  update.message.reply_text(text='*Расписание:*\n' + schedule.getSchedule('сегодня') + '\n\n*Замены:*\n' + replacements.findChange('Пр1-15', 'сегодня'), parse_mode=telegram.ParseMode.MARKDOWN)
+def tomorrow(bot, update):
+  update.message.reply_text(text='*Расписание:*\n' + schedule.getSchedule('завтра') + '\n\n*Замены:*\n' + replacements.findChange('Пр1-15', 'завтра'), parse_mode=telegram.ParseMode.MARKDOWN)
     
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -222,7 +227,9 @@ def main():
     dp.add_handler(CommandHandler("set", setNote, pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("unset", unsetNote, pass_chat_data=True))
     dp.add_handler(CommandHandler("check", checkNote, pass_chat_data=True))
-
+    dp.add_handler(CommandHandler("today", today))
+    dp.add_handler(CommandHandler("tomorrow", tomorrow))
+    
     dp.add_handler(CommandHandler('rs', restart, filters=Filters.user(username='@Dmatrix')))
 
     dp.add_handler(MessageHandler(Filters.text, echo))
