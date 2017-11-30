@@ -187,9 +187,10 @@ def checkNote(bot, update, chat_data):
         return
 
 def today(bot, update):
-  update.message.reply_text(text='*Расписание:*\n' + schedule.getSchedule('сегодня') + '\n\n*Замены:*\n' + replacements.findChange('Пр1-15', 'сегодня'), parse_mode=telegram.ParseMode.MARKDOWN)
+  update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('сегодня') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'сегодня'), parse_mode=telegram.ParseMode.HTML)
+
 def tomorrow(bot, update):
-  update.message.reply_text(text='*Расписание:*\n' + schedule.getSchedule('завтра') + '\n\n*Замены:*\n' + replacements.findChange('Пр1-15', 'завтра'), parse_mode=telegram.ParseMode.MARKDOWN)
+  update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('завтра') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'завтра'), parse_mode=telegram.ParseMode.HTML)
     
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
