@@ -18,6 +18,7 @@ def start(bot, update, job_queue, chat_data):
     regUser(update.effective_user.id, update.effective_user.username)
 
 def dbQuery(query, *args):
+    result = None
     try:
         parse.uses_netloc.append("postgres")
         dataurl = os.environ.get('DATABASE_URL')
@@ -74,11 +75,12 @@ def regUser(userid, username):
     for i in range(0, len(here)):
         newHere.insert(0,here[i][0])
     here = newHere
+    retAn = 'tbd'
     try:
         if userid not in here:
-            dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)",userid,username)
+            dbQuery("INSERT INTO users (id, name, note, ret) VALUES (%s,%s,0, %s)",userid,username, retAn)
     except IndexError:
-        dbQuery("INSERT INTO users (id, name, note) VALUES (%s,%s,0)", userid,username)
+        dbQuery("INSERT INTO users (id, name, note, ret) VALUES (%s,%s,0, %s)", userid,username,retAn)
 
 def sch(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
@@ -143,7 +145,7 @@ def echo(bot, update):
             break
     if len(ans) == 0:
         update.message.reply_text("Вопрос не найден.")
-
+    
     regUser(update.effective_user.id, update.effective_user.username)
 
 def note(bot, job):
@@ -187,11 +189,36 @@ def checkNote(bot, update, chat_data):
         return
 
 def today(bot, update):
-  update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('сегодня') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'сегодня'), parse_mode=telegram.ParseMode.HTML)
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('сегодня') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'сегодня'), parse_mode=telegram.ParseMode.HTML)
 
 def tomorrow(bot, update):
-  update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('завтра') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'завтра'), parse_mode=telegram.ParseMode.HTML)
-    
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('завтра') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'завтра'), parse_mode=telegram.ParseMode.HTML)
+
+def exam(bot, update, args):
+    rets = ['tbd', 'sys', 'ta']
+    if(len(args) != 1):
+        update.message.reply_text('Неправильное количество аргументов.')
+        return
+    if(args[0] not in rets):
+        update.message.reply_text('Неправильный аргумент. Допустимые варианты: tbd, sys, ta')
+        return
+    chat_id = update.message.chat_id
+    dbQuery("UPDATE users SET ret = %s WHERE id = %s", args[0], chat_id)
+    update.message.reply_text('Возвращаемый ответ обновлён!')
+
+def info(bot, update):
+    chat_id = update.message.chat_id
+    smth = dbQuery("SELECT * from users where id = %s", (chat_id))
+    for col in smth:
+        timers = {0 : 'Не установлен', 1 : 'Установлен'}
+        retAns = {'tbd' : 'ТБД', 'sys' : 'Системное программирование', 'ta' : 'Теория алгоритмов'}
+        ret = "Номер пользователя: {}\nTelegram ID: {}\nСтатус таймера: {}\nВозвращаемый ответ: {}".format(col[0],col[1],timers[col[3]],retAns[col[4]])
+        update.message.reply_text(ret)
+
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
@@ -231,6 +258,8 @@ def main():
     dp.add_handler(CommandHandler("check", checkNote, pass_chat_data=True))
     dp.add_handler(CommandHandler("today", today))
     dp.add_handler(CommandHandler("tomorrow", tomorrow))
+    dp.add_handler(CommandHandler("exam", exam, pass_args=True))
+    dp.add_handler(CommandHandler("info", info))
 
     dp.add_handler(CommandHandler('rs', restart, filters=Filters.user(username='@Dmatrix')))
 
