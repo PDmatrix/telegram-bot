@@ -45,7 +45,8 @@ def getSchedule(group = "пр1-15", day = "завтра"):
             week = 0
     else:
         return "Введен неправильный день. Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра."
-    f = codecs.open("rs\\{}.txt".format(group[0].upper()+group[1:len(group)]), "r", "utf-8")
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    f = codecs.open(dir_path+"\\rs\\{}.txt".format(group), "r", "utf-8")
     questions = f.readlines()
     answer = ""
     for i in range(0,len(questions)):
