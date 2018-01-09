@@ -2,7 +2,7 @@ import replacements, schedule
  
 def getHybrid(group = "пр1-15", day = "завтра"):
     zamen = replacements.findChange(group,day).replace(u'\xa0','').split('\n')
-    rsps = schedule.getSchedule(day).replace(u'\xa0','').replace(u'\ufeff','').replace(u'\r','').split('\n')
+    rsps = schedule.getSchedule(group, day).replace(u'\xa0','').replace(u'\ufeff','').replace(u'\r','').split('\n')
     if zamen[0] == "Расписание не готово.":
         return zamen[0]
     elif zamen[0] == "Что-то не так. Проверьте замены вручную.":
@@ -11,11 +11,11 @@ def getHybrid(group = "пр1-15", day = "завтра"):
         return schedule.getSchedule(day)
     elif zamen[0] == "Сервер недоступен.":
         return zamen[0]
-    if rsps[0] == "Пятница":
-        if replacements.getStar("tomorrow") == 1:
-            del rsps[3]
-        else:
-            del rsps[2]
+    #if rsps[0] == "Пятница":
+    #    if replacements.getStar("tomorrow") == 1:
+    #        del rsps[3]
+    #    else:
+    #        del rsps[2]
     last = ""
     zm = 0
     fr = True

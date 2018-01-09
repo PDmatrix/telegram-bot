@@ -52,7 +52,6 @@ def dbQuery(query, *args):
 def help(bot, update):
     update.message.reply_text(
         'Бот, присылающий ответы по предмету ТБД. Также, он может прислать замены и расписание предметов ЧЭМК.\n'
-        'На данный момент доступны замены всех групп, но расписание только группы ПР1-15.\n'
         'Для получения списка и описания комманд введите /command')
 
 def command(bot, update, args):
@@ -60,14 +59,14 @@ def command(bot, update, args):
         '/sch [день] - Расписание. По умолчанию возвращает расписание на завтра.\n'
         'Принимает один необязательный аргумент.\n'
         '[день] = \'пн\',\'вт\',\'ср\',\'чт\',\'пт\',\'сб\',\'завтра\',\'сегодня\'\n'
-        '\n/rep [день] [группа] - Замены. По умолчанию возвращает замены группы Пр1-15 на завтра.\n'
+        '\n/rep [день] [группа] - Замены. По умолчанию возвращает замены группы на завтра.\n'
         'Принимет два необязательных аргумента в любой последовательности.\n'
         '[день] = \'сегодня\', \'завтра\'\n'
         '[группа] = Группы ЧЭМК\n'
-        '\n/hyb [день] [группа] - Расписание с заменами. По умолчанию возвращает расписание группы Пр1-15 на завтра\n'
+        '\n/hyb [день] [группа] - Расписание с заменами. По умолчанию возвращает расписание группы на завтра\n'
         'Принимает два необязательных аргумента в любой последовательности.\n'
         '[день] = \'сегодня\', \'завтра\'\n'
-        '[группа] = Группы ЧЭМК. На данный момент только Пр1-15')
+        '[группа] = Группы ЧЭМК.')
 
 def regUser(userid, username):
     here = dbQuery("SELECT id FROM users")
@@ -85,10 +84,14 @@ def regUser(userid, username):
 def sch(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
                        action=ChatAction.TYPING)
+    gr = "пр1-15"
     day = "завтра"
     if len(args) == 1:
         day = args[0].lower()
-    update.message.reply_text(schedule.getSchedule(day))
+    elif len(args) == 2:
+        day = args[1].lower()
+        gr = args[0].lower();
+    update.message.reply_text(schedule.getSchedule(gr, day))
     regUser(update.effective_user.id, update.effective_user.username)
     
 
@@ -188,16 +191,6 @@ def checkNote(bot, update, chat_data):
         update.message.reply_text('Таймер установлен')
         return
 
-def today(bot, update):
-    bot.sendChatAction(chat_id=update.message.chat_id,
-                       action=ChatAction.TYPING)
-    update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('сегодня') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'сегодня'), parse_mode=telegram.ParseMode.HTML)
-
-def tomorrow(bot, update):
-    bot.sendChatAction(chat_id=update.message.chat_id,
-                       action=ChatAction.TYPING)
-    update.message.reply_text(text='<b>Расписание:</b>\n' + schedule.getSchedule('завтра') + '\n\n<b>Замены:</b>\n' + replacements.findChange('Пр1-15', 'завтра'), parse_mode=telegram.ParseMode.HTML)
-
 def exam(bot, update, args):
     rets = ['tbd', 'sys', 'ta']
     if(len(args) != 1):
@@ -256,8 +249,6 @@ def main():
     dp.add_handler(CommandHandler("set", setNote, pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("unset", unsetNote, pass_chat_data=True))
     dp.add_handler(CommandHandler("check", checkNote, pass_chat_data=True))
-    dp.add_handler(CommandHandler("today", today))
-    dp.add_handler(CommandHandler("tomorrow", tomorrow))
     dp.add_handler(CommandHandler("exam", exam, pass_args=True))
     dp.add_handler(CommandHandler("info", info))
 

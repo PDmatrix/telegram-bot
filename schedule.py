@@ -19,7 +19,7 @@ def getNum(day):
     else:
         return "Неправильно введён день."
 
-def getSchedule(day = "завтра"):
+def getSchedule(group = "пр1-15", day = "завтра"):
     date = datetime.today()
     week = date.weekday()
     day = day.lower()
@@ -45,7 +45,7 @@ def getSchedule(day = "завтра"):
             week = 0
     else:
         return "Введен неправильный день. Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра."
-    f = codecs.open("rs.txt", "r", "utf-8")
+    f = codecs.open("rs\{}.txt".format(group), "r", "utf-8")
     questions = f.readlines()
     answer = ""
     for i in range(0,len(questions)):
