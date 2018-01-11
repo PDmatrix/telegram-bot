@@ -8,7 +8,7 @@ def getHybrid(group = "пр1-15", day = "завтра"):
     elif zamen[0] == "Что-то не так. Проверьте замены вручную.":
         return zamen[0]
     elif zamen[0] == "Нет замен.":
-        return schedule.getSchedule(day)
+        return schedule.getSchedule(group, day)
     elif zamen[0] == "Сервер недоступен.":
         return zamen[0]
     #if rsps[0] == "Пятница":
