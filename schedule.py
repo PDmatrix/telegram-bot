@@ -46,8 +46,8 @@ def getSchedule(group = "пр1-15", day = "завтра"):
     else:
         return "Введен неправильный день. Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра."
     print(os.listdir())
-    print(os.path.isfile("rs/пр1-15.txt"))
-    print(os.path.isfile("./rs/пр1-15.txt"))
+    print(os.path.isfile("rs/Пр1-15.txt"))
+    print(os.path.isfile("./rs/Пр1-15.txt"))
     print(os.path.isdir("rs"))
     print(os.path.isdir("./rs"))
     print(os.path.isdir("rs/"))
