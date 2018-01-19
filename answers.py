@@ -1,4 +1,5 @@
 import codecs
+
 def getAnswer(question):
     f = codecs.open("qu.txt", "r", "utf-8")
     answers = []

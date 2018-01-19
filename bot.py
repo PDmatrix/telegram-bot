@@ -2,7 +2,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, JobQu
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent, Bot
 from threading import Thread
 from urllib import parse
-import answers, replacements, schedule, hybrid, zvonki
+import answers, replacements, schedule, hybrid
 import logging, os, sys, subprocess, psycopg2, requests
 import telegram
 
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 def start(bot, update, job_queue, chat_data):
     update.message.reply_text(
         'Добро пожаловать!\n'
+        'По умолчанию установлена группа пр1-15, для изменения введите комманду /group\n'
         'Для получения информации введите /help\n'
         'Для получения комманд введите /command')
     regUser(update.effective_user.id, update.effective_user.username)
@@ -49,12 +50,19 @@ def dbQuery(query, *args):
         conn.close()
         return result
 
+def groups():
+    grp = os.listdir(os.path.join('.','rs'))
+    grp = [x.lower()[0:-4] for x in grp]
+    return grp;
+
 def help(bot, update):
     update.message.reply_text(
         'Бот, присылающий ответы по предмету ТБД. Также, он может прислать замены и расписание предметов ЧЭМК.\n'
         'Для получения списка и описания комманд введите /command')
 
 def command(bot, update, args):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
     update.message.reply_text(
         '/sch [день] - Расписание. По умолчанию возвращает расписание на завтра.\n'
         'Принимает один необязательный аргумент.\n'
@@ -75,30 +83,40 @@ def regUser(userid, username):
         newHere.insert(0,here[i][0])
     here = newHere
     retAn = 'tbd'
+    grp = 'пр1-15'
     try:
         if userid not in here:
-            dbQuery("INSERT INTO users (id, name, note, ret) VALUES (%s,%s,0, %s)",userid,username, retAn)
+            dbQuery("INSERT INTO users (id, name, note, ret, grp) VALUES (%s,%s,0, %s, %s)",userid,username, retAn, grp)
     except IndexError:
-        dbQuery("INSERT INTO users (id, name, note, ret) VALUES (%s,%s,0, %s)", userid,username,retAn)
+        dbQuery("INSERT INTO users (id, name, note, ret, grp) VALUES (%s,%s,0, %s, %s)", userid,username,retAn, grp)
 
 def sch(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
                        action=ChatAction.TYPING)
-    gr = "пр1-15"
+    chat_id = update.message.chat_id
+    gr = dbQuery("SELECT grp FROM users WHERE id = %s", chat_id)[0][0]
     day = "завтра"
     if len(args) == 1:
-        day = args[0].lower()
+        if args[0].lower in groups():
+            gr = args[0].lower()
+        else:
+            day = args[0].lower()
     elif len(args) == 2:
-        day = args[1].lower()
-        gr = args[0].lower();
+        if args[0].lower in groups():
+            gr = args[0].lower()
+            day = args[1].lower()
+        else:
+            day = args[0].lower()
+            gr = args[1].lower()
+
     update.message.reply_text(schedule.getSchedule(gr, day))
-    regUser(update.effective_user.id, update.effective_user.username)
     
 
 def hyb(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
                        action=ChatAction.TYPING)
-    gr = "пр1-15"
+    chat_id = update.message.chat_id
+    gr = dbQuery("SELECT grp FROM users WHERE id = %s", chat_id)[0][0]
     time = "завтра"
     if len(args) == 2:
         if args[0] == "завтра" or args[0] == "сегодня":
@@ -113,13 +131,12 @@ def hyb(bot, update, args):
         else:
             gr = args[0]
     update.message.reply_text(hybrid.getHybrid(gr,time))
-
-    regUser(update.effective_user.id, update.effective_user.username)
     
 def rep(bot, update, args):
     bot.sendChatAction(chat_id=update.message.chat_id,
                        action=ChatAction.TYPING)
-    gr = "пр1-15"
+    chat_id = update.message.chat_id
+    gr = dbQuery("SELECT grp FROM users WHERE id = %s", chat_id)[0][0]
     time = "завтра"
     if len(args) == 2:
         if args[0] == "завтра" or args[0] == "сегодня":
@@ -135,7 +152,6 @@ def rep(bot, update, args):
             gr = args[0]
     update.message.reply_text(replacements.findChange(gr,time))
 
-    regUser(update.effective_user.id, update.effective_user.username)
     
 def echo(bot, update):
     bot.sendChatAction(chat_id=update.message.chat_id,
@@ -149,30 +165,54 @@ def echo(bot, update):
     if len(ans) == 0:
         update.message.reply_text("Вопрос не найден.")
     
-    regUser(update.effective_user.id, update.effective_user.username)
+
+def settings(bot, update):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    update.message.reply_text("/group - Выбор группы\n"
+        "/set - Установка таймера\n"
+        "/unset - Удаление таймера\n"
+        "/ans - Возвращаемый ответ")
+
+def group(bot, update, args):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    chat_id = update.message.chat_id
+    if(len(args) != 1):
+        update.message.reply_text("Некорректное количестов аргументов.")
+        return
+    group = args[0].lower()
+    if group not in groups():
+         update.message.reply_text("Некорректная группа.")
+    else:
+        dbQuery("UPDATE users SET grp = %s WHERE id = %s",group,chat_id)
+        update.message.reply_text("Установлена группа {}.".format(group))
 
 def note(bot, job):
     global ss
-    rp = replacements.findChange("пр1-15","завтра")
-    if rp != ss and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную." and rp != "Расписание не готово.":
-        ids = dbQuery("SELECT id FROM users WHERE note = 1")
-        try:
-          for i in range(0, len(ids)):
-            bot.send_message(ids[i][0], text = rp)
-        except Exception as e:
-          print(e)
-        ss = rp
+    ids = dbQuery("SELECT id FROM users WHERE note = 1")
+    for i in range(0, len(ids)):
+            gr = dbQuery("SELECT grp FROM users WHERE id = %s", ids[i][0])[0][0]
+            rp = replacements.findChange(gr,"завтра")
+            if rp != ss and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную." and rp != "Расписание не готово.":
+                bot.send_message(ids[i][0], text = rp)
+                ss.update({gr:rp})
         
-def setNote(bot, update, job_queue, chat_data):  
+def setNote(bot, update, job_queue, chat_data): 
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING) 
     chat_id = update.message.chat_id
     global ss
     job = job_queue.run_repeating(note, interval=60, context=chat_id)
     chat_data['job'] = job
     update.message.reply_text('Таймер на уведомление установлен!')
-    ss = replacements.findChange("пр1-15","завтра")
-    dbQuery("UPDATE users SET note = 1 WHERE id = %s" , (chat_id))
+    gr = dbQuery("SELECT grp FROM users WHERE id = %s", chat_id)[0][0]
+    ss.update({gr:replacements.findChange(gr,'завтра')})
+    dbQuery("UPDATE users SET note = 1 WHERE id = %s", chat_id)
 
 def unsetNote(bot, update, chat_data):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
     chat_id = update.message.chat_id
     if 'job' not in chat_data:
         update.message.reply_text('Таймер не установлен')
@@ -181,35 +221,31 @@ def unsetNote(bot, update, chat_data):
     job.schedule_removal()
     del chat_data['job']
     update.message.reply_text('Таймер удалён!')
-    dbQuery("UPDATE users SET note = 0 WHERE id = %s" , (chat_id))
+    dbQuery("UPDATE users SET note = 0 WHERE id = %s", chat_id)
 
-def checkNote(bot, update, chat_data):
-    if 'job' not in chat_data:
-        update.message.reply_text('Таймер не установлен')
-        return
-    else:
-        update.message.reply_text('Таймер установлен')
-        return
-
-def exam(bot, update, args):
-    rets = ['tbd', 'sys', 'ta']
+def ans(bot, update, args):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    rets = ['tbd', 'pp']
     if(len(args) != 1):
-        update.message.reply_text('Неправильное количество аргументов.')
+        update.message.reply_text('Некорректноек количество аргументов.')
         return
     if(args[0] not in rets):
-        update.message.reply_text('Неправильный аргумент. Допустимые варианты: tbd, sys, ta')
+        update.message.reply_text('Некорректный аргумент. Допустимые варианты: {}'.format(', '.join(rets)))
         return
     chat_id = update.message.chat_id
     dbQuery("UPDATE users SET ret = %s WHERE id = %s", args[0], chat_id)
     update.message.reply_text('Возвращаемый ответ обновлён!')
 
 def info(bot, update):
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
     chat_id = update.message.chat_id
     smth = dbQuery("SELECT * from users where id = %s", (chat_id))
     for col in smth:
         timers = {0 : 'Не установлен', 1 : 'Установлен'}
-        retAns = {'tbd' : 'ТБД', 'sys' : 'Системное программирование', 'ta' : 'Теория алгоритмов'}
-        ret = "Номер пользователя: {}\nTelegram ID: {}\nСтатус таймера: {}\nВозвращаемый ответ: {}".format(col[0],col[1],timers[col[3]],retAns[col[4]])
+        retAns = {'tbd' : 'ТБД', 'pp' : 'Прикладное программирование'}
+        ret = "Номер пользователя: {}\nTelegram ID: {}\nСтатус таймера: {}\nВозвращаемый ответ: {}\nГруппа: {}".format(col[0],col[1],timers[col[3]],retAns[col[4]],col[5])
         update.message.reply_text(ret)
 
 def error(bot, update, error):
@@ -217,14 +253,18 @@ def error(bot, update, error):
 
 def onStart(bot, chat_data, job_queue):
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
+    global ss
+    ss = {}
+    for i in groups():
+        ss.update({i:replacements.findChange(i,"завтра")})
     try:
         for i in range(0, len(ids)):
-            global ss
-            ss = replacements.findChange("пр1-15","завтра")
+            gr = dbQuery("SELECT grp FROM users WHERE id = %s", ids[i][0])[0][0]
             job = job_queue.run_repeating(note, interval = 60, context = ids[i][0])
             chat_data[ids[i][0] if ids[i][0] not in chat_data else None]['job'] = job
     except Exception as e:
         print(e)
+    print("BOT STARTED!")
 
 def stop_and_restart():
         updater.stop()
@@ -243,13 +283,14 @@ def main():
     dp.add_handler(CommandHandler("start", start,pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("rep", rep, pass_args=True))
+    dp.add_handler(CommandHandler("settings", settings))
+    dp.add_handler(CommandHandler("group", group, pass_args=True))
     dp.add_handler(CommandHandler("sch", sch, pass_args=True))
     dp.add_handler(CommandHandler("hyb", hyb, pass_args=True))
     dp.add_handler(CommandHandler("command", command, pass_args=True))
     dp.add_handler(CommandHandler("set", setNote, pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("unset", unsetNote, pass_chat_data=True))
-    dp.add_handler(CommandHandler("check", checkNote, pass_chat_data=True))
-    dp.add_handler(CommandHandler("exam", exam, pass_args=True))
+    dp.add_handler(CommandHandler("ans", ans, pass_args=True))
     dp.add_handler(CommandHandler("info", info))
 
     dp.add_handler(CommandHandler('rs', restart, filters=Filters.user(username='@Dmatrix')))
