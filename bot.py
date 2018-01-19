@@ -191,13 +191,12 @@ def group(bot, update, args):
 def note(bot, job):
     global ss
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
-    print(ss[gr])
     for i in range(0, len(ids)):
-            gr = dbQuery("SELECT grp FROM users WHERE id = %s", ids[i][0])[0][0]
-            rp = replacements.findChange(gr,"завтра")
-            if rp != ss[gr] and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную." and rp != "Расписание не готово.":
-                #bot.send_message(ids[i][0], text = rp)
-                ss.update({gr:rp})
+        gr = dbQuery("SELECT grp FROM users WHERE id = %s", ids[i][0])[0][0]
+        rp = replacements.findChange(gr,"завтра")
+        if rp != ss[gr] and rp != "Сервер недоступен." and rp != "Нет замен." and rp != "Что-то не так. Проверьте замены вручную." and rp != "Расписание не готово.":
+            bot.send_message(ids[i][0], text = rp)
+            ss.update({gr:rp})
         
 def setNote(bot, update, job_queue, chat_data): 
     bot.sendChatAction(chat_id=update.message.chat_id,
