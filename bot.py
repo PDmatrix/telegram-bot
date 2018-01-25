@@ -273,15 +273,25 @@ def info(bot, update):
     for col in smth:
         timers = {0: 'Не установлен', 1: 'Установлен'}
         retAns = {'tbd': 'ТБД', 'pp': 'Прикладное программирование'}
+<<<<<<< HEAD
         ret = "Номер пользователя: {}\nTelegram ID: {}\nСтатус таймера: {}" \
             "\nВозвращаемый ответ: {}\nГруппа: {}".format(
                 col[0], col[1], timers[col[3]], retAns[col[4]], col[5])
+=======
+        ret = "Номер пользователя: {}\nTelegram ID: {}\nСтатус таймера: {}"
+        "\nВозвращаемый ответ: {}\nГруппа: {}".format(
+            col[0], col[1], timers[col[3]], retAns[col[4]], col[5])
+>>>>>>> 968d229ccffdf3b0fde4826d8bbab676cf9f6132
         update.message.reply_text(ret)
 
 
 def check(bot, update):
     global ss
+<<<<<<< HEAD
     print(ss)
+=======
+    update.message.reply_text(ss)
+>>>>>>> 968d229ccffdf3b0fde4826d8bbab676cf9f6132
 
 
 def error(bot, update, error):
@@ -290,7 +300,11 @@ def error(bot, update, error):
 
 def onStart(bot, chat_data, job_queue):
     jobId = dbQuery("SELECT id FROM users WHERE id = 451884661")
+<<<<<<< HEAD
     print(jobId[0][0])
+=======
+    print(jobId)
+>>>>>>> 968d229ccffdf3b0fde4826d8bbab676cf9f6132
     global ss
     ss = {}
     for i in groups():
