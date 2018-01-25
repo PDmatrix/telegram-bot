@@ -1,6 +1,7 @@
-from datetime import datetime, date, time
+from datetime import datetime
 import codecs
 import os
+
 
 def getNum(day):
     day = day.lower()
@@ -19,22 +20,14 @@ def getNum(day):
     else:
         return "Неправильно введён день."
 
-def getSchedule(group = "пр1-15", day = "завтра"):
+
+def getSchedule(group="пр1-15", day="завтра"):
     date = datetime.today()
     week = date.weekday()
     day = day.lower()
-    if day == "пн":
-        week = 0
-    elif day == "вт":
-        week = 1
-    elif day == "ср":
-        week = 2
-    elif day == "чт":
-        week = 3
-    elif day == "пт":
-        week = 4
-    elif day == "сб":
-        week = 5
+    dc = {"пн": 0, "вт": 1, "ср": 2, "чт": 3, "пт": 4, "сб": 5}
+    if day in dc.keys():
+        week = dc[day]
     elif day == "сегодня":
         week = date.weekday()
         if week == 6:
@@ -44,14 +37,17 @@ def getSchedule(group = "пр1-15", day = "завтра"):
         if week >= 6:
             week = 0
     else:
-        return "Введен неправильный день. Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра."
-    f = codecs.open(os.path.join('.','rs','{}.txt'.format(group[0].upper() + group[1:len(group)])), "r", "utf-8")
+        return "Введен неправильный день. " \
+            "Возможные варианты: пн, вт, ср, чт, пт, сб, сегодня, завтра."
+    f = codecs.open(
+        os.path.join('.', 'rs',
+                     '{}.txt'.format(group[0].upper() + group[1:len(group)])),
+        "r", "utf-8")
     questions = f.readlines()
     answer = ""
-    for i in range(0,len(questions)):
+    for i in range(0, len(questions)):
         if getNum(questions[i]) == week:
             for j in range(i, len(questions)):
-                #print(len(questions[j]))
                 if len(questions[j]) == 1 or len(questions[j]) == 2:
                     break
                 answer += questions[j]
