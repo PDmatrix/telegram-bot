@@ -37,6 +37,8 @@ def getHybrid(group="пр1-15", day="завтра"):
                                 ' ' +
                                 zamen[i][zamen[i].find("пара"):len(zamen[i])]
                                 )
+        else:
+            newZamen.append(zamen[i])
     zamen = newZamen if len(newZamen) > 1 else zamen
     del newZamen
     for i in range(1, len(zamen)):

@@ -226,7 +226,9 @@ def note(bot, job):
         if rp != ss[gr] and rp != "Сервер недоступен." and rp != "Нет замен." \
             and rp != "Что-то не так. Проверьте замены вручную." \
                 and rp != "Расписание не готово.":
-            bot.send_message(ids[i][0], text=rp)
+            idsGroup = dbQuery("SELECT id FROM users WHERE grp = %s", gr)
+            for j in range(0, len(idsGroup)):
+                bot.send_message(idsGroup[j][0], text=rp)
             ss.update({gr: rp})
 
 
