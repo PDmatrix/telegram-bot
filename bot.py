@@ -184,7 +184,7 @@ def echo(bot, update):
         chat_id=update.message.chat_id, action=ChatAction.TYPING)
     ans = answers.getAnswer(update.message.text)
     for i in range(0, len(ans), 2):
-        update.message.reply_text(ans[i] + ans[i + 1])
+        update.message.reply_text(ans[i] + '\n' + ans[i + 1])
         if i > 10:
             update.message.reply_text(
                 "Очень много ответов. Задайте более точный вопрос.")
