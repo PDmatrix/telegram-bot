@@ -176,7 +176,7 @@ def rep(bot, update, args):
             time = args[0]
         else:
             gr = args[0]
-    update.message.reply_text(replacements.findChange(gr, time))
+    update.message.reply_text(replacements.getChange(gr, time))
 
 
 def echo(bot, update):
@@ -222,7 +222,7 @@ def note(bot, job):
     ids = dbQuery("SELECT id FROM users WHERE note = 1")
     for i in range(0, len(ids)):
         gr = dbQuery("SELECT grp FROM users WHERE id = %s", ids[i][0])[0][0]
-        rp = replacements.findChange(gr, "завтра")
+        rp = replacements.getChange(gr, "завтра")
         if rp != ss[gr] and rp != "Сервер недоступен." and rp != "Нет замен." \
             and rp != "Что-то не так. Проверьте замены вручную." \
                 and rp != "Расписание не готово.":
@@ -238,7 +238,7 @@ def setNote(bot, update, job_queue, chat_data):
     chat_id = update.message.chat_id
     update.message.reply_text('Таймер на уведомление установлен!')
     gr = dbQuery("SELECT grp FROM users WHERE id = %s", chat_id)[0][0]
-    ss.update({gr: replacements.findChange(gr, 'завтра')})
+    ss.update({gr: replacements.getChange(gr, 'завтра')})
     dbQuery("UPDATE users SET note = 1 WHERE id = %s", chat_id)
 
 
@@ -296,7 +296,7 @@ def onStart(bot, chat_data, job_queue):
     global ss
     ss = {}
     for i in groups():
-        ss.update({i: replacements.findChange(i, "завтра")})
+        ss.update({i: replacements.getChange(i, "завтра")})
     try:
         job = job_queue.run_repeating(note, interval=60, context=jobId[0][0])
         chat_data[jobId[0][0]

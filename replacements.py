@@ -1,5 +1,12 @@
 import requests
+import os
 from bs4 import BeautifulSoup
+
+
+def groups():
+    grp = os.listdir(os.path.join('.', 'rs'))
+    grp = [x.lower()[0:-4] for x in grp]
+    return grp
 
 
 # Функция получения недели(четная или нечётная)
@@ -38,7 +45,7 @@ def getStar(day="завтра"):
 
 
 # Функция поиска замен
-def findChange(group="пр1-15", day="завтра"):
+def getChange(group="пр1-15", day="завтра"):
     if day == "завтра":
         day = "tomorrow"
     elif day == "сегодня":
@@ -56,10 +63,12 @@ def findChange(group="пр1-15", day="завтра"):
         return "Расписание не готово."
     lun = 0
     ne = False
-    if len(lines[0].p.text) != 49 or len(lines[0].p.text) != 46:
-        #
+    mpa = dict.fromkeys(range(32))
+    check = len(lines[0].p.text.translate(mpa).replace(' ', ''))
+    if check != 41:
         for i in range(0, len(lines)):
-            if len(lines[i].p.text) == 49 or len(lines[i].p.text) == 46:
+            check = len(lines[i].p.text.translate(mpa).replace(' ', ''))
+            if check == 41:
                 lun = i
                 ne = True
                 break
@@ -74,46 +83,59 @@ def findChange(group="пр1-15", day="завтра"):
         rem = ""  # Переменная для запоминания пары
         fin = []
         ans2 = ""  # Финальный ответ
-        if strs[0].text.lower() == group.lower():
-            for k in range(i + 1, len(lines)):
-                for j in range(1, len(strs)):
-                    if strs[j].text == "1 п/г":
-                        rem = strs[j + 1].text
-                    ans += strs[j].text + ";"
-                    if strs[j].text == "2 п/г":
-                        ans += rem + ";"
-                strs = lines[k].find_all("p")
-                strs.insert(0, '')
-                if strs == []:
-                    break
-                # Проверка на концовку группы
-                if ans[0] == u'\xa0' and ans[2] == u'\xa0' \
-                        and ans[4] == u'\xa0':
-                    break
-                # Удаление первого символа
-                if ans[0] == u'\xa0':
-                    ans = ans[2:]
-                if ans[0] == u'\xa0':
-                    ans = ans[2:]
-
-                # Удаление всех управляющийх символов
-                mpa = dict.fromkeys(range(32))
-                fin = ans.translate(mpa).split(";")
-                ans = ""
-                if len(fin) == 3:
-                    ans2 += fin[0] + " пара: " + fin[1] + "\n"
-                    break
-                elif len(fin) == 4:
-                    ans2 += fin[1] + " пара: " + fin[0] + " " + fin[2] + "\n"
-                    break
-                elif fin[0] == "1 п/г" or fin[0] == "2 п/г" \
-                        or fin[0] == "(1/2)":
-                    ans2 += fin[1] + " пара: " + fin[0] + " " + \
-                        fin[2] + ". " + fin[3] + " " + fin[4] + "\n"
-                else:
-                    ans2 += fin[0] + " пара: " + fin[1] + ". " + \
-                        fin[2] + " " + fin[3] + "\n"
-            # Возвращение даты и замен
-            return lines[1].p.text.translate(mpa) + "\n" + ans2
+        try:
+            if strs[0].text.lower() == group.lower():
+                for k in range(i, len(lines)):
+                    leaveLoop = False
+                    strs = lines[k].find_all("p")
+                    if strs == []:
+                        break
+                    for j in range(0, len(strs)):
+                        if strs[j].text.lower() == group.lower():
+                            continue
+                        elif strs[j].text.lower() in groups():
+                            leaveLoop = True
+                            break
+                        if strs[j].text == "1 п/г":
+                            rem = strs[j + 1].text
+                        ans += strs[j].text + ";"
+                        if strs[j].text == "2 п/г":
+                            ans += rem + ";"
+                    if leaveLoop is True:
+                        break
+                    # Проверка на концовку группы
+                    if ans[0] == u'\xa0' and ans[2] == u'\xa0' \
+                            and ans[4] == u'\xa0':
+                        break
+                    # Удаление первого символа
+                    if ans[0] == u'\xa0':
+                        ans = ans[2:]
+                    if ans[0] == u'\xa0':
+                        ans = ans[2:]
+                    # Удаление всех управляющийх символов
+                    mpa = dict.fromkeys(range(32))
+                    fin = ans.translate(mpa).split(";")
+                    ans = ""
+                    if len(fin) == 3:
+                        ans2 += fin[0] + " пара: " + fin[1] + "\n"
+                        continue
+                    elif len(fin) == 4:
+                        ans2 += fin[1] + " пара: " + fin[0] + " " + fin[2] + "\n"
+                        continue
+                    elif fin[0] == "1 п/г" or fin[0] == "2 п/г" \
+                            or fin[0] == "(1/2)":
+                        ans2 += fin[1] + " пара: " + fin[0] + " " + \
+                            fin[2] + ". " + fin[3] + " " + fin[4] + "\n"
+                    else:
+                        ans2 += fin[0] + " пара: " + fin[1] + ". " + \
+                            fin[2] + " " + fin[3] + "\n"
+                # Возвращение даты и замен
+                return lines[1].p.text.translate(mpa) + "\n" + ans2
+        except Exception as e:
+            print(e)
+            return "Что-то не так. Проверьте замены вручную."
     if ans2 == "":
         return "Нет замен."
+
+
+print(getChange("и9-14", "завтра"))

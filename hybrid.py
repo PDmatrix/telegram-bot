@@ -3,7 +3,7 @@ import schedule
 
 
 def getHybrid(group="пр1-15", day="завтра"):
-    zamen = replacements.findChange(group, day).replace(u'\xa0',
+    zamen = replacements.getChange(group, day).replace(u'\xa0',
                                                         '').split('\n')
     rsps = schedule.getSchedule(group, day).replace(u'\xa0', '').replace(
         u'\ufeff', '').replace(u'\r', '').split('\n')
@@ -55,3 +55,5 @@ def getHybrid(group="пр1-15", day="завтра"):
     rsps.insert(0, tempDay)
     ans = '\n'.join(rsps[0:len(rsps)])
     return ans
+
+print(getHybrid("и7-15"))
