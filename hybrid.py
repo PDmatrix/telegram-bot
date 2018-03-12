@@ -56,4 +56,4 @@ def getHybrid(group="пр1-15", day="завтра"):
     ans = '\n'.join(rsps[0:len(rsps)])
     return ans
 
-print(getHybrid("и7-15"))
+#print(getHybrid("пр1-15"))

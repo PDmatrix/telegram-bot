@@ -64,7 +64,10 @@ def getChange(group="пр1-15", day="завтра"):
     lun = 0
     ne = False
     mpa = dict.fromkeys(range(32))
-    check = len(lines[0].p.text.translate(mpa).replace(' ', ''))
+    try:
+        check = len(lines[0].p.text.translate(mpa).replace(' ', ''))
+    except Exception as e:
+        check = len(lines[0].h1.text.translate(mpa).replace(' ', ''))
     if check != 41:
         for i in range(0, len(lines)):
             check = len(lines[i].p.text.translate(mpa).replace(' ', ''))
@@ -100,7 +103,10 @@ def getChange(group="пр1-15", day="завтра"):
                             rem = strs[j + 1].text
                         ans += strs[j].text + ";"
                         if strs[j].text == "2 п/г":
-                            ans += rem + ";"
+                            if rem != "":
+                                ans += rem + ";"
+                            else:
+                                ans + strs[j + 1].text
                     if leaveLoop is True:
                         break
                     # Проверка на концовку группы
@@ -130,6 +136,8 @@ def getChange(group="пр1-15", day="завтра"):
                         ans2 += fin[0] + " пара: " + fin[1] + ". " + \
                             fin[2] + " " + fin[3] + "\n"
                 # Возвращение даты и замен
+                if lines[1].p.text[0].isdigit() is False:
+                    return lines[2].p.text.translate(mpa) + "\n" + ans2
                 return lines[1].p.text.translate(mpa) + "\n" + ans2
         except Exception as e:
             print(e)
@@ -138,4 +146,4 @@ def getChange(group="пр1-15", day="завтра"):
         return "Нет замен."
 
 
-print(getChange("и9-14", "завтра"))
+#print(getChange("и7-15", "завтра"))
