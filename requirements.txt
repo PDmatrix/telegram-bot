@@ -21,5 +21,5 @@ requests==2.18.4
 rope==0.10.7
 six==1.11.0
 snowballstemmer==1.2.1
-urllib3==1.22
+urllib3==1.25.9
 yapf==0.20.1
