@@ -3,7 +3,7 @@ boto==2.48.0
 certifi==2017.7.27.1
 chardet==3.0.4
 configparser==3.5.0
-future==0.16.0
+future==0.18.3
 idna==2.6
 jedi==0.11.1
 json-rpc==1.10.8
